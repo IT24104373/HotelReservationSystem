@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Customer Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+<div class="max-w-6xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-blue-600">Welcome Customer: <span th:text="${user.name}"></span></h1>
+        <a href="/logout" class="bg-red-500 text-white px-4 py-2 rounded font-bold">Logout</a>
+    </div>
+
+    <div th:if="${param.error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        Selected dates are not available for this hotel! Please choose another date range.
+    </div>
+
+    <!-- Available Hotels -->
+    <h2 class="text-xl font-semibold mb-4 text-gray-700">Available Hotels to Book</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div th:each="hotel : ${hotels}" class="border p-4 rounded shadow-sm bg-blue-50">
+            <h3 class="font-bold text-lg text-blue-900" th:text="${hotel.name}"></h3>
+            <p class="text-sm text-gray-600">Location: <span th:text="${hotel.location}"></span></p>
+            <p class="text-sm font-bold text-green-600">Price: LKR <span th:text="${hotel.pricePerNight}"></span> / Night</p>
+
+            <form action="/customer/book" method="POST" class="mt-4 space-y-2">
+                <input type="hidden" name="hotelId" th:value="${hotel.id}">
+                <div>
+                    <label class="text-xs text-gray-600">Check-in Date:</label>
+                    <input type="date" name="checkInDate" required class="w-full border p-1 text-sm rounded">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-600">Check-out Date:</label>
+                    <input type="date" name="checkOutDate" required class="w-full border p-1 text-sm rounded">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white text-sm py-1.5 rounded font-bold hover:bg-blue-700">Book Hotel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- My Bookings -->
+    <h2 class="text-xl font-semibold mb-4 text-gray-700">My Bookings Status</h2>
+    <table class="w-full border text-left">
+        <tr class="bg-gray-200">
+            <th class="p-2">Booking ID</th>
+            <th class="p-2">Hotel Name</th>
+            <th class="p-2">Check-in</th>
+            <th class="p-2">Check-out</th>
+            <th class="p-2">Status</th>
+            <th class="p-2">Actions</th>
+        </tr>
+        <tr th:each="b : ${bookings}" class="border-b">
+            <td class="p-2 font-bold" th:text="${b.id}"></td>
+            <td class="p-2" th:text="${b.hotelName}"></td>
+            <td class="p-2 text-blue-600 font-bold" th:text="${b.checkInDate}"></td>
+            <td class="p-2 text-blue-600 font-bold" th:text="${b.checkOutDate}"></td>
+            <td class="p-2">
+                <span th:if="${b.status == 'BOOKED'}" class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-bold">BOOKED</span>
+                <span th:if="${b.status == 'CANCELLED'}" class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-bold">CANCELLED</span>
+            </td>
+            <td class="p-2 flex space-x-2">
+                <form action="/customer/update-booking" method="POST" class="flex space-x-1" th:if="${b.status == 'BOOKED'}">
+                    <input type="hidden" name="bookingId" th:value="${b.id}">
+                    <input type="date" name="checkInDate" required class="border p-1 text-xs rounded">
+                    <input type="date" name="checkOutDate" required class="border p-1 text-xs rounded">
+                    <button type="submit" class="bg-yellow-500 text-white text-xs px-2 py-1 rounded font-bold">Update Dates</button>
+                </form>
+                <form action="/customer/cancel-booking" method="POST" th:if="${b.status == 'BOOKED'}">
+                    <input type="hidden" name="bookingId" th:value="${b.id}">
+                    <button type="submit" class="bg-red-500 text-white text-xs px-2 py-1 rounded font-bold">Cancel</button>
+                </form>
+            </td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>
