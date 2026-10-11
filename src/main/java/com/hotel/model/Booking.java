@@ -1,6 +1,7 @@
 package com.hotel.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "bookings")
@@ -13,13 +14,13 @@ public class Booking {
     private Long customerId;
     private Long hotelId;
     private String hotelName;
-    private String checkInDate;
-    private String checkOutDate;
+    private LocalDate checkInDate;
+    private LocalDate checkOutDate;
     private String status; // BOOKED, CANCELLED
 
     public Booking() {}
 
-    public Booking(Long customerId, Long hotelId, String hotelName, String checkInDate, String checkOutDate, String status) {
+    public Booking(Long customerId, Long hotelId, String hotelName, LocalDate checkInDate, LocalDate checkOutDate, String status) {
         this.customerId = customerId;
         this.hotelId = hotelId;
         this.hotelName = hotelName;
@@ -40,11 +41,11 @@ public class Booking {
     public String getHotelName() { return hotelName; }
     public void setHotelName(String hotelName) { this.hotelName = hotelName; }
 
-    public String getCheckInDate() { return checkInDate; }
-    public void setCheckInDate(String checkInDate) { this.checkInDate = checkInDate; }
+    public LocalDate getCheckInDate() { return checkInDate; }
+    public void setCheckInDate(LocalDate checkInDate) { this.checkInDate = checkInDate; }
 
-    public String getCheckOutDate() { return checkOutDate; }
-    public void setCheckOutDate(String checkOutDate) { this.checkOutDate = checkOutDate; }
+    public LocalDate getCheckOutDate() { return checkOutDate; }
+    public void setCheckOutDate(LocalDate checkOutDate) { this.checkOutDate = checkOutDate; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
