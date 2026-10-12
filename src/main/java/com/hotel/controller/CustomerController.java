@@ -49,33 +49,51 @@ public class CustomerController {
     public String bookHotel(@RequestParam Long hotelId,
                             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInDate,
                             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOutDate,
+                            @RequestParam int guestCount,
                             HttpSession session) {
         User user = (User) session.getAttribute("user");
-        if (user != null) {
-            boolean success = hotelService.createBooking(user.getId(), hotelId, checkInDate, checkOutDate);
-            if (!success) {
-                return "redirect:/customer/dashboard?error=overlap";
-            }
+        if (user == null || !"CUSTOMER".equals(user.getRole())) {
+            return "redirect:/login";
         }
-        return "redirect:/customer/dashboard";
+
+        boolean success = hotelService.createBooking(user.getId(), hotelId, checkInDate, checkOutDate, guestCount);
+        if (!success) {
+            return "redirect:/customer/dashboard?error=invalid";
+        }
+        return "redirect:/customer/dashboard?success=created";
     }
 
     // 3. UPDATE: Reschedule / Update booking dates
     @PostMapping("/update-booking")
     public String updateBooking(@RequestParam Long bookingId,
                                 @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInDate,
-                                @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOutDate) {
-        boolean success = hotelService.updateBooking(bookingId, checkInDate, checkOutDate);
-        if (!success) {
-            return "redirect:/customer/dashboard?error=overlap";
+                                @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOutDate,
+                                @RequestParam int guestCount,
+                                HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null || !"CUSTOMER".equals(user.getRole())) {
+            return "redirect:/login";
         }
-        return "redirect:/customer/dashboard";
+
+        boolean success = hotelService.updateBooking(user.getId(), bookingId, checkInDate,
+                checkOutDate, guestCount);
+        if (!success) {
+            return "redirect:/customer/dashboard?error=unavailable";
+        }
+        return "redirect:/customer/dashboard?success=updated";
     }
 
     // 4. DELETE / CANCEL: Cancel a reservation
     @PostMapping("/cancel-booking")
-    public String cancelBooking(@RequestParam Long bookingId) {
-        hotelService.cancelBooking(bookingId);
-        return "redirect:/customer/dashboard";
+    public String cancelBooking(@RequestParam Long bookingId, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null || !"CUSTOMER".equals(user.getRole())) {
+            return "redirect:/login";
+        }
+
+        if (!hotelService.cancelBooking(user.getId(), bookingId)) {
+            return "redirect:/customer/dashboard?error=unavailable";
+        }
+        return "redirect:/customer/dashboard?success=cancelled";
     }
 }

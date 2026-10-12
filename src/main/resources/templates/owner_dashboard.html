@@ -323,12 +323,14 @@
                                     <th class="p-3 pl-4">Booking Ref</th>
                                     <th class="p-3">Check-in Date</th>
                                     <th class="p-3">Check-out Date</th>
+                                    <th class="p-3">Guests</th>
+                                    <th class="p-3">Total Price</th>
                                     <th class="p-3">Reservation Status</th>
                                 </tr>
                                 </thead>
                                 <tbody class="divide-y border-slate-800/50">
                                 <tr th:if="${hotelBookings.get(hotel.id) == null or #lists.isEmpty(hotelBookings.get(hotel.id))}">
-                                    <td colspan="4" class="p-4 text-center text-slate-500 italic">
+                                    <td colspan="6" class="p-4 text-center text-slate-500 italic">
                                         No guest bookings reserved for this property yet.
                                     </td>
                                 </tr>
@@ -345,6 +347,9 @@
                                         <i class="fa-regular fa-calendar text-slate-500 mr-1"></i>
                                         <span th:text="${b.checkOutDate}"></span>
                                     </td>
+                                    <td class="p-3 text-slate-300" th:text="${b.guestCount != null ? b.guestCount : 1}">1</td>
+                                    <td class="p-3 text-emerald-300 font-mono"
+                                        th:text="${b.totalPrice != null ? 'LKR ' + #numbers.formatDecimal(b.totalPrice, 0, 'COMMA', 0, 'POINT') : '—'}">—</td>
                                     <td class="p-3">
                                         <span th:if="${b.status == 'BOOKED'}"
                                               class="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[11px] px-2 py-0.5 rounded-full font-bold">

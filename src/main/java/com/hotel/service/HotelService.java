@@ -5,8 +5,10 @@ import com.hotel.model.Hotel;
 import com.hotel.repository.BookingRepository;
 import com.hotel.repository.HotelRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 /**
@@ -81,25 +83,22 @@ public class HotelService {
     // MEMBER 2: BOOKING MANAGEMENT (CRUD OPERATIONS)
     // =========================================================================
 
-    // 1. CREATE: Create a new reservation with overlap check
-    public boolean createBooking(Long customerId, Long hotelId, LocalDate checkIn, LocalDate checkOut) {
-        if (checkIn == null || checkOut == null || !checkOut.isAfter(checkIn)) {
+    // 1. CREATE: Create a reservation with date and hotel availability checks
+    @Transactional
+    public boolean createBooking(Long customerId, Long hotelId, LocalDate checkIn,
+                                 LocalDate checkOut, int guestCount) {
+        if (customerId == null || hotelId == null || guestCount < 1 || !isValidStay(checkIn, checkOut)) {
             return false;
         }
 
-        // Check if dates conflict with an existing confirmed booking
-        List<Booking> existing = bookingRepository.findByHotelId(hotelId);
-        for (Booking b : existing) {
-            if ("BOOKED".equals(b.getStatus())) {
-                boolean overlap = !(checkOut.isBefore(b.getCheckInDate()) || checkIn.isAfter(b.getCheckOutDate()));
-                if (overlap) return false;
-            }
-        }
+        Hotel hotel = hotelRepository.findByIdForBooking(hotelId).orElse(null);
+        if (hotel == null || hasBookingOverlap(hotelId, checkIn, checkOut, null)) return false;
 
-        Hotel hotel = hotelRepository.findById(hotelId).orElse(null);
-        if (hotel == null) return false;
+        Long totalPrice = calculateTotalPrice(hotel, checkIn, checkOut);
+        if (totalPrice == null) return false;
 
-        Booking booking = new Booking(customerId, hotelId, hotel.getName(), checkIn, checkOut, "BOOKED");
+        Booking booking = new Booking(customerId, hotelId, hotel.getName(), checkIn,
+                checkOut, guestCount, totalPrice, "BOOKED");
         bookingRepository.save(booking);
         return true;
     }
@@ -114,35 +113,76 @@ public class HotelService {
         return bookingRepository.findByHotelId(hotelId);
     }
 
-    // 3. UPDATE: Reschedule / Update booking dates with overlap check
-    public boolean updateBooking(Long bookingId, LocalDate checkIn, LocalDate checkOut) {
-        if (checkIn == null || checkOut == null || !checkOut.isAfter(checkIn)) {
+    // 3. UPDATE: Only the owning customer may update a future, active reservation
+    @Transactional
+    public boolean updateBooking(Long customerId, Long bookingId, LocalDate checkIn,
+                                 LocalDate checkOut, int guestCount) {
+        if (customerId == null || bookingId == null || guestCount < 1 || !isValidStay(checkIn, checkOut)) {
             return false;
         }
 
         Booking booking = bookingRepository.findById(bookingId).orElse(null);
-        if (booking == null) return false;
+        if (!isOwnedActiveBooking(booking, customerId)) return false;
 
-        List<Booking> existing = bookingRepository.findByHotelId(booking.getHotelId());
-        for (Booking b : existing) {
-            if ("BOOKED".equals(b.getStatus()) && !b.getId().equals(bookingId)) {
-                boolean overlap = !(checkOut.isBefore(b.getCheckInDate()) || checkIn.isAfter(b.getCheckOutDate()));
-                if (overlap) return false;
-            }
-        }
+        Hotel hotel = hotelRepository.findByIdForBooking(booking.getHotelId()).orElse(null);
+        if (hotel == null || hasBookingOverlap(booking.getHotelId(), checkIn, checkOut, bookingId)) return false;
+
+        Long totalPrice = calculateTotalPrice(hotel, checkIn, checkOut);
+        if (totalPrice == null) return false;
 
         booking.setCheckInDate(checkIn);
         booking.setCheckOutDate(checkOut);
+        booking.setGuestCount(guestCount);
+        booking.setTotalPrice(totalPrice);
         bookingRepository.save(booking);
         return true;
     }
 
-    // 4. DELETE / CANCEL: Cancel a reservation
-    public void cancelBooking(Long bookingId) {
-        Booking b = bookingRepository.findById(bookingId).orElse(null);
-        if (b != null) {
-            b.setStatus("CANCELLED");
-            bookingRepository.save(b);
+    // 4. CANCEL: Keep the reservation record and only cancel future active bookings
+    @Transactional
+    public boolean cancelBooking(Long customerId, Long bookingId) {
+        if (customerId == null || bookingId == null) return false;
+
+        Booking booking = bookingRepository.findById(bookingId).orElse(null);
+        if (!isOwnedActiveBooking(booking, customerId)
+                || booking.getCheckInDate() == null
+                || !booking.getCheckInDate().isAfter(LocalDate.now())) {
+            return false;
+        }
+
+        booking.setStatus("CANCELLED");
+        bookingRepository.save(booking);
+        return true;
+    }
+
+    private boolean isValidStay(LocalDate checkIn, LocalDate checkOut) {
+        return checkIn != null && checkOut != null
+                && !checkIn.isBefore(LocalDate.now())
+                && checkOut.isAfter(checkIn);
+    }
+
+    private boolean isOwnedActiveBooking(Booking booking, Long customerId) {
+        return booking != null
+                && customerId.equals(booking.getCustomerId())
+                && "BOOKED".equals(booking.getStatus());
+    }
+
+    private boolean hasBookingOverlap(Long hotelId, LocalDate checkIn, LocalDate checkOut,
+                                      Long excludedBookingId) {
+        return bookingRepository.findByHotelId(hotelId).stream()
+                .filter(booking -> "BOOKED".equals(booking.getStatus()))
+                .filter(booking -> excludedBookingId == null || !excludedBookingId.equals(booking.getId()))
+                .anyMatch(booking -> booking.getCheckInDate() != null
+                        && booking.getCheckOutDate() != null
+                        && checkIn.isBefore(booking.getCheckOutDate())
+                        && checkOut.isAfter(booking.getCheckInDate()));
+    }
+
+    private Long calculateTotalPrice(Hotel hotel, LocalDate checkIn, LocalDate checkOut) {
+        try {
+            return Math.multiplyExact(hotel.getPricePerNight(), ChronoUnit.DAYS.between(checkIn, checkOut));
+        } catch (ArithmeticException exception) {
+            return null;
         }
     }
 }

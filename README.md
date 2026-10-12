@@ -43,6 +43,8 @@ Java, Spring Boot, Thymeleaf, Tailwind CSS සහ SQL Database (MySQL / H2) භ�
 * **OOP යෙදීම:**
   - **Encapsulation:** දින පරාසයන් වල වලංගුභාවය (Check-out > Check-in) සහ Overlapping Bookings පරීක්ෂාව.
   - **Business Logic Isolation:** Repository හරහා දත්ත හැසිරවීම.
+* Reservation එක session එකේ authenticated customer ට පමණක් update/cancel කළ හැකි අතර booking එකේ guest count හා booking අවස්ථාවේ මිලද ගබඩා වේ.
+* Availability පරීක්ෂාව hotel මට්ටමින් ක්‍රියා කරයි. වෙනම room model එකක් නොමැති නිසා මෙය hotel එකේ සියලු rooms වෙනුවෙන් එක booking එකක් පමණක් එකවර ඉඩදෙන සරල සීමාවකි; individual room availability ලෙස නොසලකන්න.
 
 ---
 
