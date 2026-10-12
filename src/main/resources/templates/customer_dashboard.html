@@ -75,17 +75,27 @@
 <!-- Main Container -->
 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-10">
 
-    <!-- Overlap Error Notification Banner -->
+    <!-- Booking error notification -->
     <div th:if="${param.error}" class="p-4 sm:p-5 rounded-2xl bg-rose-500/15 border border-rose-500/50 text-rose-200 text-sm flex items-start gap-4 backdrop-blur-xl shadow-xl">
         <div class="w-9 h-9 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 flex-shrink-0">
             <i class="fa-solid fa-calendar-xmark text-lg"></i>
         </div>
         <div class="flex-1">
-            <h4 class="font-extrabold text-white text-base">Date Reservation Conflict</h4>
-            <p class="text-xs sm:text-sm text-rose-200 mt-0.5">
-                The selected date range is unavailable or overlaps with an existing booking for this property. Please pick alternative check-in and check-out dates.
+            <h4 class="font-extrabold text-white text-base">Reservation could not be completed</h4>
+            <p class="text-xs sm:text-sm text-rose-200 mt-0.5" th:switch="${param.error[0]}">
+                <span th:case="'invalid'">Choose valid future dates, a check-out after check-in, and at least one guest.</span>
+                <span th:case="'unavailable'">This reservation is unavailable, has conflicting dates, or can no longer be changed.</span>
+                <span th:case="*">Please check your reservation details and try again.</span>
             </p>
         </div>
+    </div>
+
+    <div th:if="${param.success}" class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-200 text-sm">
+        <span th:switch="${param.success[0]}">
+            <span th:case="'created'">Your reservation has been created.</span>
+            <span th:case="'updated'">Your reservation has been updated.</span>
+            <span th:case="'cancelled'">Your reservation has been cancelled.</span>
+        </span>
     </div>
 
     <!-- KPI Stats Overview -->
@@ -154,6 +164,8 @@
                         <th class="p-4">Property Name</th>
                         <th class="p-4">Check-in Date</th>
                         <th class="p-4">Check-out Date</th>
+                        <th class="p-4">Guests</th>
+                        <th class="p-4">Total Price</th>
                         <th class="p-4">Status</th>
                         <th class="p-4 pr-6 text-right">Actions</th>
                     </tr>
@@ -182,6 +194,11 @@
                             <span th:text="${b.checkOutDate}"></span>
                         </td>
 
+                        <td class="p-4 text-slate-300" th:text="${b.guestCount != null ? b.guestCount : 1}">1</td>
+
+                        <td class="p-4 text-emerald-300 font-mono"
+                            th:text="${b.totalPrice != null ? 'LKR ' + #numbers.formatDecimal(b.totalPrice, 0, 'COMMA', 0, 'POINT') : '—'}">—</td>
+
                         <!-- Status Badge -->
                         <td class="p-4">
                             <span th:if="${b.status == 'BOOKED'}"
@@ -200,7 +217,7 @@
                         <td class="p-4 pr-6 text-right">
                             <div class="flex items-center justify-end gap-2" th:if="${b.status == 'BOOKED'}">
                                 <!-- Trigger Reschedule Modal -->
-                                <button th:onclick="openRescheduleModal([[${b.id}]], [[${b.hotelName}]], [[${b.checkInDate}]], [[${b.checkOutDate}]])"
+                                <button th:onclick="openRescheduleModal([[${b.id}]], [[${b.hotelName}]], [[${b.checkInDate}]], [[${b.checkOutDate}]], [[${b.guestCount != null ? b.guestCount : 1}]])"
                                         class="px-3 py-1.5 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs rounded-xl font-bold transition flex items-center gap-1.5">
                                     <i class="fa-regular fa-pen-to-square"></i> Reschedule
                                 </button>
@@ -294,6 +311,14 @@
                                 <input type="date" name="checkOutDate" required
                                        class="check-out-input w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-indigo-500">
                             </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                                <i class="fa-solid fa-user-group text-indigo-400 mr-1"></i> Guests
+                            </label>
+                            <input type="number" name="guestCount" min="1" step="1" value="1" required
+                                   class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-indigo-500">
                         </div>
 
                         <!-- Live Night & Total Calculation Box (shown via JS) -->
@@ -465,6 +490,12 @@
                        class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
             </div>
 
+            <div>
+                <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Guests</label>
+                <input type="number" name="guestCount" id="rescheduleGuestCount" min="1" step="1" required
+                       class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+            </div>
+
             <div class="pt-2 flex justify-end gap-2">
                 <button type="button" onclick="closeRescheduleModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl border border-slate-700 transition">
                     Cancel
@@ -577,9 +608,10 @@
     }
 
     // Reschedule Modal controls
-    function openRescheduleModal(id, hotelName, checkIn, checkOut) {
+    function openRescheduleModal(id, hotelName, checkIn, checkOut, guestCount) {
         document.getElementById('rescheduleBookingId').value = id;
         document.getElementById('rescheduleHotelName').innerText = hotelName;
+        document.getElementById('rescheduleGuestCount').value = guestCount;
         
         const checkInInput = document.getElementById('rescheduleCheckIn');
         const checkOutInput = document.getElementById('rescheduleCheckOut');
