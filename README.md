@@ -1,118 +1,411 @@
-# 🏨 Hotel Reservation System (Campus OOP Project)
+# LuxeStay Hotel Reservation System
 
-Java, Spring Boot, Thymeleaf, Tailwind CSS සහ SQL Database (MySQL / H2) භාවිතයෙන් සාදන ලද විශ්වවිද්‍යාල OOP ව්‍යාපෘතියකි (University Group Project).
+LuxeStay යනු Java 17, Spring Boot, Thymeleaf, Tailwind CSS සහ relational database භාවිතයෙන් නිර්මාණය කළ Hotel Reservation System එකකි. මෙම project එක university OOP group project එකක් ලෙස සැලසුම් කර ඇති අතර, hotel owners, customers සහ reviews යන ප්‍රධාන business areas තුනක් ආවරණය කරයි.
+
+## Project Objectives
+
+- Hotel owners හට hotel properties create, view, update සහ delete කිරීමට ඉඩ දීම.
+- Customers හට hotels browse කර bookings create, view, reschedule සහ cancel කිරීමට ඉඩ දීම.
+- Customers හට hotel reviews සහ 1–5 star ratings create, view, update සහ delete කිරීමට ඉඩ දීම.
+- Authentication සහ role-based access මඟින් `OWNER` සහ `CUSTOMER` users වෙන් කිරීම.
+- Data persistence සඳහා JPA repositories සහ SQL database භාවිතා කිරීම.
+- OOP concepts වන encapsulation, inheritance, polymorphism සහ abstraction සැබෑ application features තුළ යෙදීම.
+
+## Technology Stack
+
+| Area | Technology |
+|---|---|
+| Language | Java 17 |
+| Framework | Spring Boot 3.1.5 |
+| Web layer | Spring MVC, Thymeleaf |
+| UI | HTML, Tailwind CSS CDN, custom CSS, Font Awesome |
+| Persistence | Spring Data JPA / Hibernate |
+| Database drivers | H2, MySQL, Microsoft SQL Server |
+| Build tool | Maven Wrapper (`mvnw.cmd`) |
+| Default server port | `8080` |
+
+## Application Architecture
+
+The application follows a layered architecture:
+
+```text
+Browser / Thymeleaf pages
+            |
+       Controllers
+            |
+        Services
+            |
+      Repositories
+            |
+       JPA Entities
+            |
+       SQL Database
+```
+
+### Package structure
+
+```text
+src/main/java/com/hotel/
+├── config/
+│   └── WebResourceConfig.java
+├── controller/
+│   ├── AuthController.java
+│   ├── CustomerController.java
+│   ├── OwnerController.java
+│   └── ReviewController.java
+├── model/
+│   ├── AbstractUser.java
+│   ├── Booking.java
+│   ├── Customer.java
+│   ├── Hotel.java
+│   ├── HotelOwner.java
+│   ├── Review.java
+│   └── User.java
+├── repository/
+│   ├── BookingRepository.java
+│   ├── HotelRepository.java
+│   ├── ReviewRepository.java
+│   └── UserRepository.java
+└── service/
+    ├── HotelService.java
+    └── ReviewService.java
+```
+
+## OOP Concepts Used
+
+### 1. Encapsulation
+
+Model attributes are private and accessed through public getters and setters. Business validation is also kept inside the model or service layer.
+
+- [`Hotel.java`](src/main/java/com/hotel/model/Hotel.java)
+  - Keeps hotel fields private.
+  - Prevents a nightly price below LKR 1,000 through `setPricePerNight`.
+- [`Review.java`](src/main/java/com/hotel/model/Review.java)
+  - Keeps rating private.
+  - `setRating` restricts values to the range 1–5.
+- [`Booking.java`](src/main/java/com/hotel/model/Booking.java)
+  - Encapsulates dates, guest count, total price and booking status.
+- [`AbstractUser.java`](src/main/java/com/hotel/model/AbstractUser.java)
+  - Encapsulates common user identity fields.
+
+### 2. Inheritance
+
+[`AbstractUser.java`](src/main/java/com/hotel/model/AbstractUser.java) is the common mapped superclass for user types:
+
+```text
+AbstractUser
+├── Customer
+├── HotelOwner
+└── User
+```
+
+Common fields such as `id`, `name`, `email` and `password` are defined once in the parent class and inherited by the child classes.
+
+### 3. Polymorphism
+
+- **Method overriding:** `Customer`, `HotelOwner` and `User` provide their own implementation of the abstract `getRole()` method.
+- **Method overloading:** [`HotelService.java`](src/main/java/com/hotel/service/HotelService.java) contains:
+  - `getHotels()` to retrieve all hotels.
+  - `getHotels(Long ownerId)` to retrieve hotels belonging to one owner.
+
+### 4. Abstraction
+
+- [`AbstractUser.java`](src/main/java/com/hotel/model/AbstractUser.java) exposes the common user contract while leaving `getRole()` to subclasses.
+- Repository interfaces hide database implementation details:
+  - `HotelRepository`
+  - `BookingRepository`
+  - `ReviewRepository`
+  - `UserRepository`
+- Controllers call service methods instead of writing SQL directly.
+
+### 5. Composition and separation of responsibilities
+
+- Controllers handle HTTP requests and session checks.
+- Services handle business rules.
+- Repositories handle persistence.
+- Models represent database entities.
+- Thymeleaf templates handle the user interface.
+
+## CRUD Operations
+
+CRUD means:
+
+- **Create:** Add a new record.
+- **Read:** Retrieve and display records.
+- **Update:** Change an existing record.
+- **Delete:** Remove or cancel a record.
+
+The project implements complete CRUD flows for the three assigned modules below.
 
 ---
 
-## 👥 ළමුන් තිදෙනා අතර කාර්යය බෙදීම (Work Breakdown for 3 Students)
+## Member 1: Hotel Property Management
 
-මෙම ව්‍යාපෘතිය සිසුන් තිදෙනෙකුට (3 Members) පහසුවෙන් viva presentation එකකදී පැහැදිලි කිරීමට හැකි වන පරිදි වෙන වෙනම Module 3 කට සහ සම්පූර්ණ **CRUD Operations** සහිතව නිර්මාණය කර ඇත:
+### Responsibility
 
----
+Member 1 manages hotel property listings owned by a hotel owner. A property includes:
 
-### 👤 Member 1: Hotel Property Management (හෝටල් කළමනාකරණය)
-* **අදාළ Classes/Files:**
-  - `model/Hotel.java`
-  - `repository/HotelRepository.java`
-  - `service/HotelService.java`
-  - `controller/OwnerController.java`
-  - `templates/owner_dashboard.html`
-* **CRUD Operations:**
-  - **[C] Create:** හෝටල් හිමිකරු විසින් නව හෝටලයක් පද්ධතියට ඇතුළත් කිරීම (`/owner/add-hotel`).
-  - **[R] Read:** ලියාපදිංචි කර ඇති සියලු හෝටල් සහ ඒවායේ විස්තර නැරඹීම (`/owner/dashboard`, `/`).
-  - **[U] Update:** හෝටලයේ නම, මිල, පිහිටීම, ඡායාරූපය සහ විස්තර Edit/Update කිරීම (`/owner/update-hotel`).
-  - **[D] Delete:** හෝටලයක් පද්ධතියෙන් ඉවත් කිරීම (`/owner/delete-hotel`).
-* **OOP යෙදීම:**
-  - **Encapsulation:** Hotel model හි සියලු fields `private` කර getters/setters මඟින් ලබාදීම සහ අවම මිල LKR 1000 වීමේ validation.
-  - **Polymorphism (Method Overloading):** `HotelService` තුළ `getHotels()` සහ `getHotels(Long ownerId)` ලෙස methods overload කර තිබීම.
+- Hotel name
+- Location
+- Price per night
+- Description
+- Image URL or uploaded image
+- Owner ID
 
----
+### Class files
 
-### 👤 Member 2: Reservation & Booking Management (වෙන්කිරීම් කළමනාකරණය)
-* **අදාළ Classes/Files:**
-  - `model/Booking.java`
-  - `repository/BookingRepository.java`
-  - `service/HotelService.java` (Booking methods)
-  - `controller/CustomerController.java`
-  - `templates/customer_dashboard.html`
-* **CRUD Operations:**
-  - **[C] Create:** හෝටලයක් සඳහා Check-in සහ Check-out දින තෝරා වෙන්කිරීමක් සිදු කිරීම (`/customer/book`).
-  - **[R] Read:** පාරිභෝගිකයා විසින් සිදු කරන ලද සියලුම Bookings ලැයිස්තුව සහ තත්ත්වය නැරඹීම (`/customer/dashboard`).
-  - **[U] Update:** කලින් වෙන්කළ Booking එකක දින Reschedule / Update කිරීම (`/customer/update-booking`).
-  - **[D] Delete / Cancel:** වෙන්කිරීමක් Cancel කිරීම (`/customer/cancel-booking`).
-* **OOP යෙදීම:**
-  - **Encapsulation:** දින පරාසයන් වල වලංගුභාවය (Check-out > Check-in) සහ Overlapping Bookings පරීක්ෂාව.
-  - **Business Logic Isolation:** Repository හරහා දත්ත හැසිරවීම.
-* Reservation එක session එකේ authenticated customer ට පමණක් update/cancel කළ හැකි අතර booking එකේ guest count හා booking අවස්ථාවේ මිලද ගබඩා වේ.
-* Availability පරීක්ෂාව hotel මට්ටමින් ක්‍රියා කරයි. වෙනම room model එකක් නොමැති නිසා මෙය hotel එකේ සියලු rooms වෙනුවෙන් එක booking එකක් පමණක් එකවර ඉඩදෙන සරල සීමාවකි; individual room availability ලෙස නොසලකන්න.
+| Layer | File | Responsibility |
+|---|---|---|
+| Model | [`Hotel.java`](src/main/java/com/hotel/model/Hotel.java) | Hotel entity and property fields |
+| Repository | [`HotelRepository.java`](src/main/java/com/hotel/repository/HotelRepository.java) | Hotel persistence and owner-based lookup |
+| Service | [`HotelService.java`](src/main/java/com/hotel/service/HotelService.java) | Hotel validation and business logic |
+| Controller | [`OwnerController.java`](src/main/java/com/hotel/controller/OwnerController.java) | Owner dashboard and hotel CRUD endpoints |
+| Configuration | [`WebResourceConfig.java`](src/main/java/com/hotel/config/WebResourceConfig.java) | Serves uploaded hotel images |
+| View | [`owner_dashboard.html`](src/main/resources/templates/owner_dashboard.html) | Add, edit, delete and view properties |
+| View | [`index.html`](src/main/resources/templates/index.html) | Public hotel listings |
 
----
+### CRUD mapping
 
-### 👤 Member 3: Review & Rating Management (ශ්‍රේණිගත කිරීම් සහ සමාලෝචන කළමනාකරණය)
-* **අදාළ Classes/Files:**
-  - `model/Review.java`
-  - `repository/ReviewRepository.java`
-  - `service/ReviewService.java`
-  - `controller/ReviewController.java`
-  - `templates/customer_dashboard.html` (Review Section)
-* **CRUD Operations:**
-  - **[C] Create:** හෝටලයක් සඳහා තරු 1-5 දක්වා Rating එකක් සහ Comment එකක් ලබාදීම (`/review/add`).
-  - **[R] Read:** තමා ලබාදුන් සියලුම Reviews සහ ඒවායේ දිනයන් නැරඹීම (`/customer/dashboard#my-reviews`).
-  - **[U] Update:** ලබාදුන් Review එකෙහි Rating හෝ Comment එක Edit/Update කිරීම (`/review/update`).
-  - **[D] Delete:** ලබාදුන් Review එකක් ඉවත් කිරීම (`/review/delete`).
-* **OOP යෙදීම:**
-  - **Encapsulation:** Rating අගය 1 ත් 5 ත් අතර පමණක් සීමා කිරීම (`setRating` validation).
-  - **Abstraction:** `ReviewRepository` interface එක Spring Data JPA හරහා Abstraction පෙන්වීම.
+| Operation | Endpoint | Description |
+|---|---|---|
+| Create | `POST /owner/add-hotel` | Creates a property for the logged-in owner |
+| Read | `GET /owner/dashboard` | Displays the owner's properties |
+| Read | `GET /` | Displays public hotel listings |
+| Update | `POST /owner/update-hotel` | Updates property details |
+| Delete | `POST /owner/delete-hotel` | Deletes a property |
 
----
+### Property image upload
 
-## 🏛️ OOP Concepts (Object-Oriented Programming) යොදාගත් ආකාරය
+The owner may enter an image URL or upload an image from the local computer.
 
-| OOP Concept | Project එකේ යොදා ඇති ආකාරය | අදාළ Classes / Code |
-| :--- | :--- | :--- |
-| **Encapsulation** | සියලු Model classes වල attributes `private` කර public Getters & Setters සහ validations (මිල, තරු ගණන, දින) හරහා දත්ත ආරක්ෂා කිරීම. | `Hotel.java`, `Booking.java`, `Review.java`, `User.java` |
-| **Inheritance** | `AbstractUser` මවු පන්තියෙන් (Parent Class) `Customer`, `HotelOwner`, `User` දරු පන්ති (Child Classes) බිහිවීම. | `AbstractUser.java` ➡️ `Customer.java`, `HotelOwner.java` |
-| **Polymorphism (Overriding)** | `AbstractUser` හි ඇති `getRole()` abstract method එක එක් එක් child class එක තුළ override කර අදාළ role එක ලබාදීම. | `@Override public String getRole()` |
-| **Polymorphism (Overloading)** | එකම නම සහිත methods වෙනස් parameters සහිතව භාවිතා කිරීම. | `getHotels()` සහ `getHotels(Long ownerId)` |
-| **Abstraction** | `AbstractUser` abstract class එක මඟින් අත්‍යවශ්‍ය method signatures පමණක් අර්ථ දැක්වීම සහ JPA Repository interfaces. | `AbstractUser.java`, `HotelRepository.java`, `ReviewRepository.java` |
+- Form field: `imageFile`
+- Accepted content types: `image/*`
+- New files are saved under `uploads/hotels`.
+- The database stores a URL such as `/uploads/hotels/<generated-file-name>`.
+- [`WebResourceConfig.java`](src/main/java/com/hotel/config/WebResourceConfig.java) maps `/uploads/hotels/**` to the upload directory.
+- Existing legacy files under `src/main/resources/static/uploads/hotels` are also supported.
 
----
+### Business rules
 
-## 🗄️ SQL Database Configuration
+- Only an authenticated user with role `OWNER` can access the owner dashboard.
+- The minimum nightly price is LKR 1,000.
+- Owner properties are loaded using the current owner's ID.
+- Uploaded files must have an image MIME type.
 
-මෙම project එක **MySQL Database** (XAMPP / MySQL Workbench) හෝ **H2 Embedded SQL Database** යන දෙකටම සහය දක්වයි.
+## Member 2: Reservation & Booking Management
 
-`src/main/resources/application.properties` ගොනුව මඟින් Database එක තෝරාගත හැක:
+### Responsibility
 
-### 1. MySQL (XAMPP) භාවිතයෙන් Run කිරීමට:
-1. XAMPP Control Panel එකෙන් **Apache** සහ **MySQL** Start කරන්න.
-2. `application.properties` ගොනුවේ ඇති MySQL settings වල comment ඉවත් කරන්න:
-   ```properties
-   spring.datasource.url=jdbc:mysql://localhost:3306/hotel_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-   spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-   spring.datasource.username=root
-   spring.datasource.password=
-   spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
-   ```
-   *(සටහන: `hotel_db` database එක MySQL තුළ auto-create වේ).*
+Member 2 manages the complete reservation lifecycle:
 
-### 2. H2 Embedded SQL Database (Default):
-කිසිදු බාහිර මෘදුකාංගයක් run නොකර ක්ෂණිකව test කිරීමට default ලෙස H2 SQL database එක සකසා ඇත.
+- Search and view available hotel listings
+- Create reservations
+- View current and previous reservations
+- Reschedule reservations
+- Cancel reservations
+- Calculate total price using nightly price, date range and guest count
 
----
+### Class files
 
-## 🚀 How to Run the Project
+| Layer | File | Responsibility |
+|---|---|---|
+| Model | [`Booking.java`](src/main/java/com/hotel/model/Booking.java) | Booking entity, dates, guests, price and status |
+| Repository | [`BookingRepository.java`](src/main/java/com/hotel/repository/BookingRepository.java) | Booking persistence and queries |
+| Service | [`HotelService.java`](src/main/java/com/hotel/service/HotelService.java) | Booking creation, validation, update and cancellation |
+| Controller | [`CustomerController.java`](src/main/java/com/hotel/controller/CustomerController.java) | Customer booking endpoints |
+| View | [`customer_dashboard.html`](src/main/resources/templates/customer_dashboard.html) | Booking forms, booking list and rescheduling modal |
+| View | [`index.html`](src/main/resources/templates/index.html) | Public hotel booking entry point |
 
-1. Terminal එකෙන් හෝ IDE (IntelliJ IDEA, Eclipse, VS Code) එකෙන් project එක open කර run කරන්න:
-   ```bash
-   mvn spring-boot:run
-   ```
-2. Web Browser එක විවෘත කර `http://localhost:8080` වෙත පිවිසෙන්න.
+### CRUD mapping
 
-### 🔑 Demo Accounts (පරීක්ෂා කිරීම සඳහා):
-- **Customer Account (Member 2 & 3):**
-  - Email: `customer@hotel.com`
-  - Password: `123456`
-- **Hotel Owner Account (Member 1):**
-  - Email: `owner@hotel.com`
-  - Password: `123456`
+| Operation | Endpoint | Description |
+|---|---|---|
+| Create | `POST /customer/book` | Creates a reservation |
+| Read | `GET /customer/dashboard` | Displays the customer's bookings |
+| Update | `POST /customer/update-booking` | Reschedules dates or changes guest count |
+| Delete / Cancel | `POST /customer/cancel-booking` | Cancels a reservation |
+
+### Booking business rules
+
+- Only the logged-in customer can update or cancel their own booking.
+- Check-in and check-out dates must be valid.
+- Check-out must be after check-in.
+- Guest count must be at least one.
+- Dates must satisfy the application's future-date rules.
+- Overlapping active bookings are rejected.
+- The booking stores the guest count and total price at booking time.
+- Booking status values include `BOOKED` and `CANCELLED`.
+- This project models availability at hotel level; it does not contain a separate room entity.
+
+## Member 3: Review & Rating Management
+
+### Responsibility
+
+Member 3 manages customer feedback for hotel properties:
+
+- Add a review after a stay or booking
+- View personal reviews
+- View reviews associated with a hotel
+- Edit review rating or comment
+- Delete a review
+
+### Class files
+
+| Layer | File | Responsibility |
+|---|---|---|
+| Model | [`Review.java`](src/main/java/com/hotel/model/Review.java) | Review entity, rating validation and review date |
+| Repository | [`ReviewRepository.java`](src/main/java/com/hotel/repository/ReviewRepository.java) | Review persistence and hotel/customer queries |
+| Service | [`ReviewService.java`](src/main/java/com/hotel/service/ReviewService.java) | Review CRUD and ownership rules |
+| Controller | [`ReviewController.java`](src/main/java/com/hotel/controller/ReviewController.java) | Review endpoints |
+| View | [`customer_dashboard.html`](src/main/resources/templates/customer_dashboard.html) | Customer review form and personal reviews |
+| View | [`owner_dashboard.html`](src/main/resources/templates/owner_dashboard.html) | Reviews shown to hotel owners |
+
+### CRUD mapping
+
+| Operation | Endpoint | Description |
+|---|---|---|
+| Create | `POST /review/add` | Adds a 1–5 star review and comment |
+| Read | `GET /customer/dashboard` | Displays the customer's reviews |
+| Read | Owner dashboard | Displays reviews for each owned hotel |
+| Update | `POST /review/update` | Updates rating or comment |
+| Delete | `POST /review/delete` | Deletes a review |
+
+### Review business rules
+
+- Rating values are limited to 1–5.
+- The review date is recorded automatically.
+- A customer can manage only their own reviews.
+- Owners can see reviews belonging to their hotel properties.
+- Review data includes customer ID, customer name, hotel ID, hotel name, rating, comment and date.
+
+## Authentication and Role Management
+
+Authentication is handled by [`AuthController.java`](src/main/java/com/hotel/controller/AuthController.java).
+
+| Feature | Endpoint |
+|---|---|
+| Public home page | `GET /` |
+| Login page | `GET /login` |
+| Login submission | `POST /login` |
+| Registration page | `GET /register` |
+| Registration submission | `POST /register` |
+| Logout | `GET /logout` |
+
+The current user is stored in the HTTP session. Controllers check the user's role before allowing access to owner or customer operations.
+
+## Database Entities
+
+| Entity | Table | Main fields |
+|---|---|---|
+| `User` | `users` | id, name, email, password, role |
+| `Customer` | `customers` | inherited user fields |
+| `Hotel` | `hotels` | name, location, price, owner, image, description |
+| `Booking` | `bookings` | customer, hotel, dates, guests, total price, status |
+| `Review` | `reviews` | customer, hotel, rating, comment, review date |
+
+The SQL Server recreation script is available at [`database/create-hotelreservationdb.sql`](database/create-hotelreservationdb.sql). It creates the database schema and seed data for development/testing.
+
+## Database Configuration
+
+The active configuration is in [`application.properties`](src/main/resources/application.properties). The current project configuration targets SQL Server:
+
+```properties
+server.port=8080
+spring.datasource.url=jdbc:sqlserver://localhost:1177;databaseName=HotelReservationDB
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.SQLServerDialect
+```
+
+### SQL Server / SSMS setup
+
+1. Start the SQL Server service.
+2. Open SSMS and connect to the configured SQL Server instance.
+3. Execute [`database/create-hotelreservationdb.sql`](database/create-hotelreservationdb.sql).
+4. Configure the credentials as environment variables:
+
+```powershell
+$env:DB_USERNAME = "sa"
+$env:DB_PASSWORD = "your-sql-server-password"
+```
+
+5. If the SQL Server port is different, update the URL in `application.properties` or use the SQL Server profile in [`application-sqlserver.properties`](src/main/resources/application-sqlserver.properties).
+6. Refresh `HotelReservationDB > Tables` in SSMS after starting the application.
+
+The web application and SSMS must use the same database configuration. If the application runs against H2 while SSMS shows SQL Server, web changes will not appear in SSMS.
+
+## How to Run
+
+### Windows
+
+```powershell
+cd D:\projects\HotelReservationSystem\HotelReservationSystem
+.\mvnw.cmd clean spring-boot:run
+```
+
+If using the SQL Server profile:
+
+```powershell
+$env:DB_USERNAME = "sa"
+$env:DB_PASSWORD = "your-sql-server-password"
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=sqlserver"
+```
+
+Then open:
+
+```text
+http://localhost:8080
+```
+
+### Demo accounts
+
+The database script provides sample accounts for testing. Confirm the exact seeded credentials in [`database/create-hotelreservationdb.sql`](database/create-hotelreservationdb.sql).
+
+Typical development accounts are:
+
+| Role | Email | Password |
+|---|---|---|
+| Customer | `customer@hotel.com` | `123456` |
+| Owner | `owner@hotel.com` | `123456` |
+
+## Testing and Validation
+
+Compile the project:
+
+```powershell
+.\mvnw.cmd -DskipTests compile
+```
+
+Run the test suite:
+
+```powershell
+.\mvnw.cmd test
+```
+
+Booking regression tests are located in [`HotelServiceBookingTests.java`](src/test/java/com/hotel/service/HotelServiceBookingTests.java). They verify booking dates, guest count and total price persistence after an update.
+
+## Important Project Files
+
+| File | Purpose |
+|---|---|
+| [`pom.xml`](pom.xml) | Maven dependencies and Spring Boot build configuration |
+| [`application.properties`](src/main/resources/application.properties) | Active application and database settings |
+| [`application-sqlserver.properties`](src/main/resources/application-sqlserver.properties) | SQL Server profile settings |
+| [`database/create-hotelreservationdb.sql`](database/create-hotelreservationdb.sql) | SQL Server schema and seed data |
+| [`style.css`](src/main/resources/static/css/style.css) | Light theme, responsive layout and UI styling |
+| [`index.html`](src/main/resources/templates/index.html) | Public hotel listing page |
+| [`owner_dashboard.html`](src/main/resources/templates/owner_dashboard.html) | Owner property and review management |
+| [`customer_dashboard.html`](src/main/resources/templates/customer_dashboard.html) | Customer bookings and reviews |
+
+## Summary for Viva Presentation
+
+### Member 1
+
+“I implemented hotel property management. My module uses `Hotel`, `HotelRepository`, `HotelService` and `OwnerController`. It supports complete CRUD operations, owner-specific listings, price validation and hotel image uploads.”
+
+### Member 2
+
+“I implemented reservation and booking management. My module uses `Booking`, `BookingRepository`, `HotelService` and `CustomerController`. It validates dates and availability, calculates total prices, and supports create, read, reschedule and cancel operations.”
+
+### Member 3
+
+“I implemented review and rating management. My module uses `Review`, `ReviewRepository`, `ReviewService` and `ReviewController`. It supports 1–5 ratings, comments, automatic review dates, ownership validation and complete CRUD operations.”

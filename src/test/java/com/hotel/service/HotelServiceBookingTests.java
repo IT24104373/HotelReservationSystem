@@ -109,6 +109,10 @@ class HotelServiceBookingTests {
                 checkIn.plusDays(4), 3));
 
         verify(bookingRepository).save(booking);
+        assertEquals(checkIn.plusDays(1), booking.getCheckInDate());
+        assertEquals(checkIn.plusDays(4), booking.getCheckOutDate());
+        assertEquals(3, booking.getGuestCount());
+        assertEquals(30000L, booking.getTotalPrice());
     }
 
     @Test

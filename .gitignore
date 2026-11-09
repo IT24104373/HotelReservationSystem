@@ -35,3 +35,7 @@ build/
 /.idea/
 *.iml
 *.log
+
+# Local H2 runtime database files
+data/*.mv.db
+data/*.trace.db
