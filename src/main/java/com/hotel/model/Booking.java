@@ -18,7 +18,7 @@ public class Booking {
     private LocalDate checkOutDate;
     private Integer guestCount;
     private Long totalPrice;
-    private String status; // BOOKED, CANCELLED
+    private String status;
 
     public Booking() {}
 

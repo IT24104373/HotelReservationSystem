@@ -12,15 +12,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 /**
- * ============================================================================
- * SERVICES: Hotel & Booking Business Logic
- * - MEMBER 1: Hotel Management (Full CRUD)
- * - MEMBER 2: Booking Management (Full CRUD)
- * 
- * OOP Concepts:
- * - Polymorphism: Method Overloading with getHotels()
- * - Encapsulation: Date & Price validations inside methods
- * ============================================================================
+ * Provides hotel and reservation business logic.
  */
 @Service
 public class HotelService {
@@ -33,11 +25,6 @@ public class HotelService {
         this.bookingRepository = bookingRepository;
     }
 
-    // =========================================================================
-    // MEMBER 1: HOTEL MANAGEMENT (CRUD OPERATIONS)
-    // =========================================================================
-
-    // 1. CREATE: Save a new hotel with validation (Min LKR 1000 & multiples of LKR 500)
     public boolean saveHotel(Hotel hotel) {
         if (hotel.getPricePerNight() < 1000 || hotel.getPricePerNight() % 500 != 0) {
             return false;
@@ -46,17 +33,14 @@ public class HotelService {
         return true;
     }
 
-    // 2. READ: Polymorphism (Method Overloading - Version 1: Get all hotels)
     public List<Hotel> getHotels() {
         return hotelRepository.findAll();
     }
 
-    // 2. READ: Polymorphism (Method Overloading - Version 2: Get hotels by owner ID)
     public List<Hotel> getHotels(Long ownerId) {
         return hotelRepository.findByOwnerId(ownerId);
     }
 
-    // 3. UPDATE: Update hotel details (Min LKR 1000 & multiples of LKR 500)
     public boolean updateHotel(Long hotelId, String name, String location, long pricePerNight, String imageUrl, String description) {
         if (pricePerNight < 1000 || pricePerNight % 500 != 0) {
             return false;
@@ -74,16 +58,10 @@ public class HotelService {
         return false;
     }
 
-    // 4. DELETE: Delete a hotel by ID
     public void deleteHotel(Long hotelId) {
         hotelRepository.deleteById(hotelId);
     }
 
-    // =========================================================================
-    // MEMBER 2: BOOKING MANAGEMENT (CRUD OPERATIONS)
-    // =========================================================================
-
-    // 1. CREATE: Create a reservation with date and hotel availability checks
     @Transactional
     public boolean createBooking(Long customerId, Long hotelId, LocalDate checkIn,
                                  LocalDate checkOut, int guestCount) {
@@ -103,17 +81,14 @@ public class HotelService {
         return true;
     }
 
-    // 2. READ: Get bookings by customer ID
     public List<Booking> getCustomerBookings(Long customerId) {
         return bookingRepository.findByCustomerId(customerId);
     }
 
-    // 2. READ: Get bookings by hotel ID (for owner view)
     public List<Booking> getBookingsForHotel(Long hotelId) {
         return bookingRepository.findByHotelId(hotelId);
     }
 
-    // 3. UPDATE: Only the owning customer may update a future, active reservation
     @Transactional
     public boolean updateBooking(Long customerId, Long bookingId, LocalDate checkIn,
                                  LocalDate checkOut, int guestCount) {
@@ -138,7 +113,6 @@ public class HotelService {
         return true;
     }
 
-    // 4. CANCEL: Keep the reservation record and only cancel future active bookings
     @Transactional
     public boolean cancelBooking(Long customerId, Long bookingId) {
         if (customerId == null || bookingId == null) return false;

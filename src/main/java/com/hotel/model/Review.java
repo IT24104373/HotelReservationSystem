@@ -4,10 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 /**
- * ============================================================================
- * MEMBER 3 MODULE: Review & Rating Management
- * OOP Concept: Encapsulation (Private fields with getter/setter validations)
- * ============================================================================
+ * Stores a customer's rating and comment for a hotel.
  */
 @Entity
 @Table(name = "reviews")
@@ -22,7 +19,6 @@ public class Review {
     private Long hotelId;
     private String hotelName;
 
-    // Encapsulation validation: rating must be between 1 and 5
     private int rating;
 
     @Column(length = 1000)
@@ -39,12 +35,11 @@ public class Review {
         this.customerName = customerName;
         this.hotelId = hotelId;
         this.hotelName = hotelName;
-        setRating(rating); // using setter for validation
+        setRating(rating);
         this.comment = comment;
         this.reviewDate = LocalDate.now();
     }
 
-    // Getters and Setters with Encapsulation Validation
     public Long getId() {
         return id;
     }
@@ -89,7 +84,6 @@ public class Review {
         return rating;
     }
 
-    // Encapsulation validation rule
     public void setRating(int rating) {
         if (rating < 1) {
             this.rating = 1;

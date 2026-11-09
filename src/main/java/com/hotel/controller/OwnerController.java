@@ -21,10 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * ============================================================================
- * MEMBER 1 MODULE: Hotel Owner Management Controller
- * Handles full CRUD operations for Hotel Properties
- * ============================================================================
+ * Handles owner dashboard and hotel property requests.
  */
 @Controller
 @RequestMapping("/owner")
@@ -39,7 +36,6 @@ public class OwnerController {
         this.reviewService = reviewService;
     }
 
-    // 1. READ: Owner Dashboard listing all hotels owned by this user
     @GetMapping("/dashboard")
     public String dashboard(HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
@@ -63,7 +59,6 @@ public class OwnerController {
         return "owner_dashboard";
     }
 
-    // 2. CREATE: Add a new hotel property
     @PostMapping("/add-hotel")
     public String addHotel(@RequestParam String name,
                            @RequestParam String location,
@@ -86,7 +81,6 @@ public class OwnerController {
         return "redirect:/owner/dashboard";
     }
 
-    // 3. UPDATE: Edit an existing hotel property
     @PostMapping("/update-hotel")
     public String updateHotel(@RequestParam Long hotelId,
                               @RequestParam String name,
@@ -106,7 +100,6 @@ public class OwnerController {
         return "redirect:/owner/dashboard";
     }
 
-    // 4. DELETE: Delete a hotel property
     @PostMapping("/delete-hotel")
     public String deleteHotel(@RequestParam Long hotelId) {
         hotelService.deleteHotel(hotelId);
