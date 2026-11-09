@@ -1,7 +1,5 @@
 # LuxeStay Hotel Reservation System
 
-LuxeStay යනු Java 17, Spring Boot, Thymeleaf, Tailwind CSS සහ relational database භාවිතයෙන් නිර්මාණය කළ Hotel Reservation System එකකි. මෙම project එක university OOP group project එකක් ලෙස සැලසුම් කර ඇති අතර, hotel owners, customers සහ reviews යන ප්‍රධාන business areas තුනක් ආවරණය කරයි.
-
 ## Project Objectives
 
 - Hotel owners හට hotel properties create, view, update සහ delete කිරීමට ඉඩ දීම.
