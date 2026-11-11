@@ -7,10 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * ============================================================================
- * MEMBER 3 MODULE: Review Controller
- * Handles CRUD operations for Customer Reviews & Ratings
- * ============================================================================
+ * Handles customer review requests.
  */
 @Controller
 @RequestMapping("/review")
@@ -22,7 +19,6 @@ public class ReviewController {
         this.reviewService = reviewService;
     }
 
-    // 1. CREATE: Add a new review
     @PostMapping("/add")
     public String addReview(@RequestParam Long hotelId,
                             @RequestParam String hotelName,
@@ -36,7 +32,6 @@ public class ReviewController {
         return "redirect:/customer/dashboard#my-reviews";
     }
 
-    // 2. UPDATE: Edit an existing review
     @PostMapping("/update")
     public String updateReview(@RequestParam Long reviewId,
                                @RequestParam int rating,
@@ -49,7 +44,6 @@ public class ReviewController {
         return "redirect:/customer/dashboard#my-reviews";
     }
 
-    // 3. DELETE: Delete an existing review
     @PostMapping("/delete")
     public String deleteReview(@RequestParam Long reviewId,
                                HttpSession session) {

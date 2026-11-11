@@ -17,11 +17,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Main Spring Boot Application with initial demo data seeder.
- * Provides sample data for all 3 Student Modules:
- * - Member 1: Hotels
- * - Member 2: Bookings
- * - Member 3: Reviews & Ratings
+ * Starts the application and loads sample data when the database is empty.
  */
 @SpringBootApplication
 public class HotelReservationSystemApplication {
@@ -37,14 +33,12 @@ public class HotelReservationSystemApplication {
                                       ReviewRepository reviewRepository) {
         return args -> {
             if (hotelRepository.count() == 0) {
-                // 1. Seed Demo Accounts
                 User owner = new User("Nimal Fernando", "owner@hotel.com", "123456", "OWNER");
                 userRepository.save(owner);
 
                 User customer = new User("Kamal Perera", "customer@hotel.com", "123456", "CUSTOMER");
                 userRepository.save(customer);
 
-                // 2. Member 1: Seed Hotels
                 Hotel h1 = new Hotel(
                         "Amanwella Ocean Sanctuary",
                         "Tangalle, Southern Province",
@@ -83,7 +77,6 @@ public class HotelReservationSystemApplication {
 
                 hotelRepository.saveAll(List.of(h1, h2, h3, h4));
 
-                // 3. Member 2: Seed Sample Booking
                 Booking b1 = new Booking(
                         customer.getId(),
                         h1.getId(),
@@ -94,7 +87,6 @@ public class HotelReservationSystemApplication {
                 );
                 bookingRepository.save(b1);
 
-                // 4. Member 3: Seed Sample Review
                 Review r1 = new Review(
                         customer.getId(),
                         customer.getName(),

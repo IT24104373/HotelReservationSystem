@@ -7,8 +7,8 @@
 
 body {
     font-family: var(--font-body);
-    background-color: #090d16;
-    color: #e2e8f0;
+    background-color: #f3f1ec;
+    color: #1e293b;
     overflow-x: hidden;
 }
 
@@ -92,4 +92,562 @@ h1, h2, h3, h4, h5, h6, .font-heading {
     filter: blur(100px);
     pointer-events: none;
     z-index: 0;
+}
+
+/* Light theme overrides for the Tailwind utility classes used by the pages. */
+body.bg-\[\#090d16\] {
+    background:
+        radial-gradient(circle at 8% 8%, rgba(251, 191, 36, 0.12), transparent 30rem),
+        radial-gradient(circle at 92% 18%, rgba(129, 140, 248, 0.12), transparent 34rem),
+        linear-gradient(135deg, #f8f6f1 0%, #eef2f1 52%, #f2f0f7 100%) !important;
+    background-attachment: fixed;
+}
+
+html {
+    background-color: #f3f1ec;
+}
+
+/* Home page hotel photo slideshow. The soft wash preserves readable foreground text. */
+.home-page {
+    position: relative;
+}
+
+.hotel-background-slideshow {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    background: #eef2f1;
+}
+
+.hotel-background-slideshow::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(135deg, rgba(248, 246, 241, 0.84), rgba(238, 242, 241, 0.78)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.38));
+}
+
+.hotel-background-slide {
+    position: absolute;
+    inset: -2%;
+    background-position: center;
+    background-size: cover;
+    opacity: 0;
+    transform: scale(1.03);
+    transition: opacity 1.4s ease, transform 7s ease;
+}
+
+.hotel-background-slide.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.home-page > header,
+.home-page > main {
+    position: relative;
+    z-index: 1;
+}
+
+.home-page > .fixed {
+    z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hotel-background-slide {
+        transition: none;
+    }
+}
+
+.site-header {
+    background-color: rgba(11, 15, 25, 0.94) !important;
+    border-color: #334155 !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.site-header [class~="text-white"] {
+    color: #f8fafc !important;
+}
+
+.site-header [class~="text-slate-300"],
+.site-header [class~="text-slate-400"] {
+    color: #cbd5e1 !important;
+}
+
+.site-header a:hover {
+    color: #ffffff !important;
+}
+
+.site-header [class*="bg-slate-800"] {
+    background-color: rgba(30, 41, 59, 0.85) !important;
+}
+
+.site-header [class*="border-slate"] {
+    border-color: #475569 !important;
+}
+
+.site-header {
+    background: #0b1220 !important;
+    background-color: #0b1220 !important;
+    border-bottom-color: #334155 !important;
+}
+
+.publish-property-button {
+    background: rgba(255, 255, 255, 0.72) !important;
+    border: 1px solid rgba(148, 163, 184, 0.8) !important;
+    color: #1e293b !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.14) !important;
+}
+
+.publish-property-button:hover {
+    background: rgba(255, 255, 255, 0.92) !important;
+    color: #0f172a !important;
+}
+
+[class~="bg-[#090d16]"],
+[class~="bg-[#0b0f19]"],
+[class*="bg-[#0b0f19]"] {
+    background-color: #ffffff !important;
+}
+
+[class~="bg-slate-950"],
+[class~="bg-slate-900"],
+[class~="bg-slate-900/70"],
+[class~="bg-slate-900/80"],
+[class~="bg-slate-800/80"],
+[class*="bg-slate-900/"],
+[class*="bg-slate-800/"] {
+    background-color: #ffffff !important;
+}
+
+[class~="bg-slate-800/60"],
+[class~="bg-slate-700/80"] {
+    background-color: #f1f5f9 !important;
+}
+
+[class~="bg-indigo-950/40"] {
+    background-color: #e8eaf8 !important;
+}
+
+[class~="bg-emerald-950/80"] {
+    background-color: #e2f5ee !important;
+    color: #065f46 !important;
+}
+
+[class~="text-slate-100"],
+[class~="text-slate-200"],
+[class~="text-slate-300"],
+[class~="text-slate-400"],
+[class~="text-slate-500"] {
+    color: #334155 !important;
+}
+
+[class*="text-slate-300/"],
+[class*="text-slate-400/"] {
+    color: #334155 !important;
+    opacity: 1 !important;
+}
+
+[class~="text-white"] {
+    color: #0f172a !important;
+}
+
+[class~="border-slate-800"],
+[class~="border-slate-800/80"],
+[class~="border-slate-800/90"],
+[class~="border-slate-700/60"],
+[class~="border-slate-700"],
+[class~="border-slate-700/70"],
+[class~="border-slate-700/80"] {
+    border-color: #cbd5e1 !important;
+}
+
+input[class*="bg-slate-800"],
+textarea[class*="bg-slate-800"],
+select[class*="bg-slate-800"] {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #94a3b8 !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #64748b !important;
+    opacity: 1;
+}
+
+[class~="from-slate-950/80"] {
+    --tw-gradient-from: rgb(15 23 42 / 0.35) !important;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.glass-panel {
+    background: rgba(255, 255, 255, 0.88);
+    border-color: #e2e8f0;
+}
+
+.glass-panel-elevated {
+    background: rgba(255, 255, 255, 0.96);
+    border-color: #e2e8f0;
+    box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.15);
+}
+
+.glass-input {
+    background: #ffffff;
+    border-color: #cbd5e1;
+    color: #1e293b;
+}
+
+.glass-input:focus {
+    background: #ffffff;
+}
+
+/* Replace remaining dark-theme dialog surfaces with the light palette. */
+#rescheduleModal > div,
+#editReviewModal > div,
+#editHotelModal > div {
+    background-color: #fffdf8 !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+#rescheduleModal h3,
+#editReviewModal h3,
+#editHotelModal h3,
+#rescheduleModal [class~="text-white"],
+#editReviewModal [class~="text-white"],
+#editHotelModal [class~="text-white"] {
+    color: #0f172a !important;
+}
+
+#rescheduleModal label,
+#editReviewModal label,
+#editHotelModal label,
+#rescheduleModal [class~="text-slate-300"],
+#editReviewModal [class~="text-slate-300"],
+#editHotelModal [class~="text-slate-300"],
+#rescheduleModal [class~="text-slate-400"],
+#editReviewModal [class~="text-slate-400"],
+#editHotelModal [class~="text-slate-400"] {
+    color: #334155 !important;
+}
+
+#rescheduleModal input,
+#editReviewModal input,
+#editReviewModal select,
+#editReviewModal textarea,
+#editHotelModal input,
+#editHotelModal textarea {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #94a3b8 !important;
+}
+
+#rescheduleModal [class~="bg-slate-800"],
+#editReviewModal [class~="bg-slate-800"],
+#editHotelModal [class~="bg-slate-800"] {
+    background-color: #f1f5f9 !important;
+    color: #334155 !important;
+}
+
+.booking-calc-form {
+    background-color: rgba(255, 255, 255, 0.72) !important;
+    border-color: #cbd5e1 !important;
+}
+
+.calc-preview {
+    background-color: #eef2ff !important;
+    border-color: #818cf8 !important;
+    color: #1e293b !important;
+}
+
+.calc-preview > div,
+.calc-preview span:first-child {
+    color: #1e293b !important;
+    opacity: 1 !important;
+}
+
+.calc-preview .stay-nights {
+    color: #3730a3 !important;
+}
+
+.calc-preview .stay-total {
+    color: #047857 !important;
+}
+
+/* Customer dashboard light theme: keep booking details readable. */
+.customer-dashboard .booking-calc-form {
+    background-color: #fffdf8 !important;
+    border-color: #cbd5e1 !important;
+}
+
+.customer-dashboard .booking-calc-form label {
+    color: #334155 !important;
+    opacity: 1 !important;
+}
+
+.customer-dashboard .booking-calc-form input {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #94a3b8 !important;
+}
+
+.customer-dashboard #rescheduleModal {
+    background-color: rgba(15, 23, 42, 0.38) !important;
+}
+
+.customer-dashboard #rescheduleModal > div {
+    background-color: #fffdf8 !important;
+    border-color: #94a3b8 !important;
+    color: #0f172a !important;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25) !important;
+}
+
+.customer-dashboard #rescheduleModal h3,
+.customer-dashboard #rescheduleModal p,
+.customer-dashboard #rescheduleModal label,
+.customer-dashboard #rescheduleModal span,
+.customer-dashboard #rescheduleModal button.text-slate-400,
+.customer-dashboard #rescheduleModal button.text-slate-300 {
+    color: #334155 !important;
+    opacity: 1 !important;
+}
+
+.customer-dashboard #rescheduleModal h3 {
+    color: #0f172a !important;
+}
+
+.customer-dashboard #rescheduleModal input {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #94a3b8 !important;
+}
+
+.customer-dashboard #rescheduleModal button[type="submit"] {
+    background: #f59e0b !important;
+    color: #1e293b !important;
+}
+
+.customer-dashboard #rescheduleModal button[type="button"] {
+    background-color: #e8edf2 !important;
+    color: #334155 !important;
+    border-color: #94a3b8 !important;
+}
+
+/* Owner dashboard light-theme surfaces and controls. */
+.owner-dashboard [class*="bg-slate-900"],
+.owner-dashboard [class*="bg-slate-800"],
+.owner-dashboard [class*="bg-slate-700"] {
+    background-color: #fffdf8 !important;
+}
+
+.owner-dashboard [class*="bg-slate-800/50"],
+.owner-dashboard [class*="bg-slate-800/60"] {
+    background-color: #f5f3ee !important;
+}
+
+.owner-dashboard [class*="bg-slate-950"] {
+    background-color: #eef1f4 !important;
+}
+
+.owner-dashboard [class*="text-slate-500"],
+.owner-dashboard [class*="text-slate-400"],
+.owner-dashboard [class*="text-slate-300"] {
+    color: #334155 !important;
+    opacity: 1 !important;
+}
+
+.owner-dashboard [class~="text-white"] {
+    color: #0f172a !important;
+}
+
+.owner-dashboard button[class*="bg-slate-800"],
+.owner-dashboard button[class*="bg-slate-700"] {
+    background-color: #e8edf2 !important;
+    color: #1e293b !important;
+    border-color: #94a3b8 !important;
+}
+
+.owner-dashboard button[class*="text-amber-300"] {
+    background-color: #fff4d6 !important;
+    color: #92400e !important;
+    border-color: #fbbf24 !important;
+}
+
+.owner-dashboard button[class*="text-rose-300"] {
+    background-color: #ffe4e6 !important;
+    color: #9f1239 !important;
+    border-color: #fb7185 !important;
+}
+
+.owner-dashboard tr[class*="bg-slate"],
+.owner-dashboard td[class*="text-slate-500"] {
+    background-color: #eef1f4 !important;
+    color: #334155 !important;
+}
+
+.owner-dashboard [class*="border-slate"] {
+    border-color: #cbd5e1 !important;
+}
+
+.owner-dashboard #editHotelModal {
+    background-color: rgba(15, 23, 42, 0.18) !important;
+}
+
+.owner-dashboard #editHotelModal > div {
+    background-color: #fffdf8 !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+.owner-dashboard #editHotelModal label {
+    color: #334155 !important;
+    opacity: 1 !important;
+}
+
+.owner-dashboard #editHotelModal input,
+.owner-dashboard #editHotelModal textarea {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #94a3b8 !important;
+}
+
+/* All remaining dialog backdrops use the light palette instead of dark mode. */
+#editReviewModal,
+#detailsModal {
+    background-color: rgba(15, 23, 42, 0.18) !important;
+}
+
+#editReviewModal > div {
+    background-color: #fffdf8 !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+#editReviewModal input,
+#editReviewModal textarea,
+#editReviewModal select {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #94a3b8 !important;
+}
+
+#editReviewModal button[type="button"] {
+    background-color: #f1f5f9 !important;
+    color: #334155 !important;
+    border-color: #94a3b8 !important;
+}
+
+#detailsModal .light-modal {
+    background-color: #fffdf8 !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+/* Keep only the navigation strip dark while preserving readable branding. */
+body > header.site-header,
+body > header.site-header[class*="bg-"] {
+    background: #0b1220 !important;
+    background-color: #0b1220 !important;
+    border-bottom: 1px solid #334155 !important;
+}
+
+body > header.site-header a > div:last-child > span:first-child,
+body > header.site-header .text-white {
+    color: #f8fafc !important;
+}
+
+body > header.site-header a > div:last-child > span:last-child {
+    color: #fbbf24 !important;
+}
+
+body > header.site-header [class*="bg-[#090d16]"] {
+    background-color: #111827 !important;
+}
+
+/* Match the owner controls to the compact customer-portal header style. */
+body.owner-dashboard > header.site-header > div > div:last-child > div {
+    background: #17243a !important;
+    border-color: #475569 !important;
+    box-shadow: none !important;
+}
+
+body.owner-dashboard > header.site-header > div > div:last-child > div > div:first-child {
+    background: rgba(99, 102, 241, 0.35) !important;
+    border-color: rgba(99, 102, 241, 0.7) !important;
+    color: #c7d2fe !important;
+}
+
+body.owner-dashboard > header.site-header > div > div:last-child > div .text-white {
+    color: #f8fafc !important;
+}
+
+body.owner-dashboard > header.site-header > div > div:last-child > div .text-amber-400 {
+    color: #34d399 !important;
+}
+
+body.owner-dashboard > header.site-header > div > div:last-child > a[href="/"] {
+    color: #cbd5e1 !important;
+    background: rgba(30, 41, 59, 0.82) !important;
+    border-color: #475569 !important;
+}
+
+body.owner-dashboard > header.site-header > div > div:last-child > a[href="/logout"] {
+    color: #fda4af !important;
+    background: rgba(159, 18, 57, 0.12) !important;
+    border-color: rgba(244, 63, 94, 0.45) !important;
+}
+
+/* Keep the details dialog readable on the light theme, including its image overlay. */
+.light-modal {
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+.light-modal [class~="text-white"] {
+    color: #ffffff !important;
+}
+
+.light-modal [class~="bg-slate-950"],
+.light-modal [class~="bg-slate-900/80"] {
+    background-color: rgba(15, 23, 42, 0.9) !important;
+}
+
+.light-modal [class~="bg-slate-800/60"] {
+    background-color: #f1f5f9 !important;
+}
+
+.light-modal [class~="text-slate-300"],
+.light-modal [class~="text-slate-400"] {
+    color: #334155 !important;
+}
+
+.light-modal [class~="border-slate-700"],
+.light-modal [class~="border-slate-700/60"] {
+    border-color: #cbd5e1 !important;
+}
+
+.light-modal .text-emerald-400 {
+    color: #059669 !important;
+}
+
+.light-modal > div:last-child {
+    background-color: #ffffff;
 }
